@@ -1,0 +1,36 @@
+
+import express from 'express';
+import bodyParser from 'body-parser';
+import mongoose from 'mongoose';
+import cors from 'cors';
+
+// .env 파일 불러오기 위해서는 dotenv 필수
+import dotenv from "dotenv";
+
+import postRoutes from './routes/posts.js';
+
+// dotenv config 
+dotenv.config();
+const app = express();
+
+
+app.use(bodyParser.json({ limit: "30mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
+app.use(cors());
+
+app.use('/posts', postRoutes);
+
+// dotenv를 통해 .env파일에 저장되어 있는 MONGO_URL 불러와 변수에 저장
+const env_1 = process.env;
+// console.log(env_1.MONGO_URL);
+
+// https:// www.mongodb.com/cloud/atlas
+const CONNECTION_URL = env_1.MONGO_URL;
+
+const PORT = process.env.PORT || 5000;
+
+mongoose.connect(CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => app.listen(PORT, () => console.log(`Server running on port: ${PORT}`)))
+    .catch((error) => console.log(error.message))
+    ;
+mongoose.set('useFindAndModify', false);
